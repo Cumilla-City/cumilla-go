@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
 import 'widgets/navigation_drawer.dart';
 import 'widgets/bottom_navigation.dart';
+import 'package:google_fonts/google_fonts.dart';  // Add this import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,8 +42,29 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
             useMaterial3: true,  // Add this for Material 3 design
+            textTheme: GoogleFonts.hindSiliguriTextTheme(
+              Theme.of(context).textTheme,
+            ),
+            appBarTheme: AppBarTheme(
+              titleTextStyle: GoogleFonts.hindSiliguri(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
           ),
-          darkTheme: ThemeData.dark(),
+          darkTheme: ThemeData.dark().copyWith(
+            textTheme: GoogleFonts.hindSiliguriTextTheme(
+              ThemeData.dark().textTheme,
+            ),
+            appBarTheme: AppBarTheme(
+              titleTextStyle: GoogleFonts.hindSiliguri(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
           initialRoute: '/',
           routes: {
             '/': (context) => PlacesScreen(),
@@ -71,7 +93,7 @@ class _PlacesScreenState extends State<PlacesScreen> {
     {'icon': Icons.directions_bus, 'label': 'পরিবহন', 'color': Colors.brown},
     {'icon': Icons.local_police, 'label': 'আইন-শৃঙ্খলা', 'color': Colors.indigo},
     {'icon': Icons.park, 'label': 'পার্ক', 'color': Colors.teal},
-    {'icon': Icons.shopping_cart, 'label': 'শপিং', 'color': Colors.pink},
+    {'icon': Icons.shopping_cart, 'label': 'শপং', 'color': Colors.pink},
     {'icon': Icons.restaurant, 'label': 'রেস্টুরেন্ট', 'color': Colors.amber},
     {'icon': Icons.local_hospital, 'label': 'হাপাতাল', 'color': Colors.red},
     {'icon': Icons.sports_soccer, 'label': 'খেলাধুলা', 'color': Colors.green},
@@ -145,7 +167,7 @@ class _PlacesScreenState extends State<PlacesScreen> {
                 SizedBox(height: 4),
                 Text(
                   features[index]['label'],
-                  style: TextStyle(
+                  style: GoogleFonts.hindSiliguri(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -197,7 +219,7 @@ class PoliceStationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('পুলিশ স্টেশন')),
+      appBar: AppBar(title: Text('পুল��শ স্টেশন')),
       body: ListView(
         children: [
           // Police station list items will go here
