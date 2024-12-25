@@ -115,22 +115,7 @@ class _PlacesScreenState extends State<PlacesScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text('Cumilla GO'),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.brightness_6),
-            onPressed: () {
-              Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
-            },
-          ),
-        ],
       ),
-      drawer: AppNavigationDrawer(),
       body: GridView.builder(
         padding: EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
