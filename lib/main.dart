@@ -7,6 +7,7 @@ import 'models/place.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
+import 'widgets/navigation_drawer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,9 +39,15 @@ class MyApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           theme: ThemeData(
             primarySwatch: Colors.blue,
+            useMaterial3: true,  // Add this for Material 3 design
           ),
           darkTheme: ThemeData.dark(),
-          home: PlacesScreen(),
+          initialRoute: '/',
+          routes: {
+            '/': (context) => PlacesScreen(),
+            '/tourist-places': (context) => TouristPlacesScreen(),
+            '/hospitals': (context) => HospitalsScreen(),
+          },
         );
       },
     );
@@ -107,7 +114,22 @@ class _PlacesScreenState extends State<PlacesScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text('Cumilla GO'),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.brightness_6),
+            onPressed: () {
+              Provider.of<ThemeProvider>(context, listen: false).toggleTheme();
+            },
+          ),
+        ],
       ),
+      drawer: AppNavigationDrawer(),
       body: GridView.builder(
         padding: EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -192,6 +214,20 @@ class PoliceStationsScreen extends StatelessWidget {
       body: ListView(
         children: [
           // Police station list items will go here
+        ],
+      ),
+    );
+  }
+}
+
+class HospitalsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('হাসপাতাল')),
+      body: ListView(
+        children: [
+          // Hospital list items will go here
         ],
       ),
     );
