@@ -1,0 +1,17 @@
+[
+    {
+      "name": "Shahid Minar",
+      "description": "A historical monument in Cumilla that stands as a symbol of the Language Movement.",
+      "imageUrl": "https://i.imgur.com/placeholder1.jpg",
+      "latitude": 23.4624,
+      "longitude": 91.1872
+    },
+    {
+      "name": "Mainamati",
+      "description": "An ancient Buddhist archaeological site featuring ruins of numerous monasteries.",
+      "imageUrl": "https://i.imgur.com/placeholder2.jpg",
+      "latitude": 23.4000,
+      "longitude": 91.1800
+    }
+  ]
+  
