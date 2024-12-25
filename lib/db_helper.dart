@@ -1,61 +1,95 @@
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
-class DBHelper {
-  static final DBHelper _instance = DBHelper._internal();
+class DatabaseHelper {
+  static final DatabaseHelper _instance = DatabaseHelper._internal();
+  factory DatabaseHelper() => _instance;
   static Database? _database;
 
-  DBHelper._internal();
-
-  factory DBHelper() => _instance;
+  DatabaseHelper._internal();
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB();
+    _database = await _initDatabase();
     return _database!;
   }
 
-  Future<Database> _initDB() async {
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = "${documentsDirectory.path}/cumilla_go.db";
-
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: _onCreate,
-    );
+  Future<Database> _initDatabase() async {
+    String path = join(await getDatabasesPath(), 'cumilla_go.db');
+    return openDatabase(path, onCreate: (db, version) async {
+      await db.execute('''
+        CREATE TABLE landmarks(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT,
+          description TEXT,
+          latitude REAL,
+          longitude REAL,
+          category TEXT
+        )
+      ''');
+      await db.execute('''
+        CREATE TABLE emergency_contacts(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT,
+          type TEXT,
+          phone_number TEXT
+        )
+      ''');
+      await db.execute('''
+        CREATE TABLE transport_routes(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          route_name TEXT,
+          start_point TEXT,
+          end_point TEXT,
+          stops TEXT
+        )
+      ''');
+    }, version: 1);
   }
 
-  Future<void> _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE landmarks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        description TEXT,
-        latitude REAL,
-        longitude REAL,
-        category TEXT
-      )
-    ''');
+  Future<void> insertSampleData() async {
+    final db = await database;
 
-    await db.execute('''
-      CREATE TABLE emergency_contacts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        type TEXT,
-        phone_number TEXT
-      )
-    ''');
+    // Insert landmarks
+    await db.insert('landmarks', {
+      'name': 'Lalmai Hill',
+      'description': 'A historic hill in Cumilla.',
+      'latitude': 23.4618,
+      'longitude': 91.1809,
+      'category': 'Tourist Spot',
+    });
 
-    await db.execute('''
-      CREATE TABLE transport_routes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        route_name TEXT,
-        start_point TEXT,
-        end_point TEXT,
-        stops TEXT
-      )
-    ''');
+    // Insert emergency contacts
+    await db.insert('emergency_contacts', {
+      'name': 'Police Station',
+      'type': 'Police',
+      'phone_number': '999',
+    });
+
+    // Insert transport routes
+    await db.insert('transport_routes', {
+      'route_name': 'Cumilla Bus Route',
+      'start_point': 'Cumilla Station',
+      'end_point': 'Dhaka Station',
+      'stops': '["Cumilla", "Narsingdi", "Dhaka"]',
+    });
+  }
+
+  // Method to get data from landmarks table
+  Future<List<Map<String, dynamic>>> getLandmarks() async {
+    final db = await database;
+    return db.query('landmarks');
+  }
+
+  // Method to get emergency contacts
+  Future<List<Map<String, dynamic>>> getEmergencyContacts() async {
+    final db = await database;
+    return db.query('emergency_contacts');
+  }
+
+  // Method to get transport routes
+  Future<List<Map<String, dynamic>>> getTransportRoutes() async {
+    final db = await database;
+    return db.query('transport_routes');
   }
 }
