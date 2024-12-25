@@ -1,0 +1,18 @@
+{
+  "features": [
+    {
+      "id": "feature1",
+      "title": "Feature One",
+      "description": "Description of feature one",
+      "path": "/feature-one",
+      "links": []
+    },
+    {
+      "id": "feature2", 
+      "title": "Feature Two",
+      "description": "Description of feature two",
+      "path": "/feature-two",
+      "links": []
+    }
+  ]
+} 
