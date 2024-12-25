@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
 import 'widgets/navigation_drawer.dart';
+import 'widgets/bottom_navigation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -171,6 +172,7 @@ class _PlacesScreenState extends State<PlacesScreen> {
           );
         },
       ),
+      bottomNavigationBar: BottomNavigation(),
     );
   }
 }
