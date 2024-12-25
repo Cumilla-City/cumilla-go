@@ -17,6 +17,7 @@ dependencies:
   path_provider: ^2.0.10
   json_annotation: ^4.7.0
   path: ^1.8.0
+  provider: ^6.0.5
 
 dev_dependencies:
   flutter_test:

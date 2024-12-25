@@ -5,6 +5,8 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // Import for FFI initiali
 import 'database_helper.dart';
 import 'models/place.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:provider/provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,18 +18,31 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   }
 
-  runApp(CumillaCityApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
-class CumillaCityApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Cumilla City App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: PlacesScreen(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Cumilla City App',
+          themeMode: themeProvider.themeMode,
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          darkTheme: ThemeData.dark(),
+          home: PlacesScreen(),
+        );
+      },
     );
   }
 }
@@ -50,10 +65,36 @@ class _PlacesScreenState extends State<PlacesScreen> {
     {'icon': Icons.park, 'label': 'পার্ক', 'color': Colors.teal},
     {'icon': Icons.shopping_cart, 'label': 'শপিং', 'color': Colors.pink},
     {'icon': Icons.restaurant, 'label': 'রেস্টুরেন্ট', 'color': Colors.amber},
-    {'icon': Icons.local_hospital, 'label': 'হাসপাতাল', 'color': Colors.red},
+    {'icon': Icons.local_hospital, 'label': 'হাপাতাল', 'color': Colors.red},
     {'icon': Icons.sports_soccer, 'label': 'খেলাধুলা', 'color': Colors.green},
     // Add more features as needed
   ];
+
+  void _navigateToFeature(BuildContext context, String label) {
+    Widget screen;
+    switch (label) {
+      case 'নাগরিক':
+        screen = DonorListScreen();
+        break;
+      case 'দর্শনীয় স্থান':
+        screen = TouristPlacesScreen();
+        break;
+      case 'আইন-শৃঙ্খলা':
+        screen = PoliceStationsScreen();
+        break;
+      // Add more cases for other features
+      default:
+        screen = Scaffold(
+          appBar: AppBar(title: Text(label)),
+          body: Center(child: Text('$label কনটেন্ট শীঘ্রই আসছে')),
+        );
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
+  }
 
   @override
   void initState() {
@@ -76,34 +117,82 @@ class _PlacesScreenState extends State<PlacesScreen> {
         ),
         itemCount: features.length,
         itemBuilder: (context, index) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: features[index]['color'].withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+          return GestureDetector(
+            onTap: () => _navigateToFeature(context, features[index]['label']),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: features[index]['color'].withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    features[index]['icon'],
+                    color: features[index]['color'],
+                    size: 30,
+                  ),
                 ),
-                child: Icon(
-                  features[index]['icon'],
-                  color: features[index]['color'],
-                  size: 30,
+                SizedBox(height: 4),
+                Text(
+                  features[index]['label'],
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                features[index]['label'],
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+              ],
+            ),
           );
         },
+      ),
+    );
+  }
+}
+
+class DonorListScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('ডোনার তালিকা')),
+      body: ListView(
+        children: [
+          // Donor list items will go here
+        ],
+      ),
+    );
+  }
+}
+
+class TouristPlacesScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('দর্শনীয় স্থান')),
+      body: GridView.builder(
+        // Tourist places grid
+        itemCount: 0,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+        ),
+        itemBuilder: (context, index) => Container(),
+      ),
+    );
+  }
+}
+
+class PoliceStationsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('পুলিশ স্টেশন')),
+      body: ListView(
+        children: [
+          // Police station list items will go here
+        ],
       ),
     );
   }
