@@ -1,30 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'db_helper.dart';
 
 void main() {
+  // Initialize the sqflite databaseFactory for ffi
+  databaseFactory = databaseFactoryFfi;
+
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  late Future<List<Map<String, dynamic>>> landmarks;
-  late Future<List<Map<String, dynamic>>> emergencyContacts;
-  late Future<List<Map<String, dynamic>>> transportRoutes;
-
-  @override
-  void initState() {
-    super.initState();
-    // Insert sample data on app start
-    insertSampleData();
-    landmarks = DatabaseHelper().getLandmarks();
-    emergencyContacts = DatabaseHelper().getEmergencyContacts();
-    transportRoutes = DatabaseHelper().getTransportRoutes();
-  }
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,87 +17,71 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Cumilla Go'),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: landmarks,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Text('No landmarks found');
-                  } else {
-                    return Column(
-                      children: snapshot.data!.map((landmark) {
-                        return ListTile(
-                          title: Text(landmark['name']),
-                          subtitle: Text(landmark['description']),
-                        );
-                      }).toList(),
-                    );
-                  }
-                },
-              ),
-              Divider(),
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: emergencyContacts,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Text('No emergency contacts found');
-                  } else {
-                    return Column(
-                      children: snapshot.data!.map((contact) {
-                        return ListTile(
-                          title: Text(contact['name']),
-                          subtitle: Text('${contact['type']} - ${contact['phone_number']}'),
-                        );
-                      }).toList(),
-                    );
-                  }
-                },
-              ),
-              Divider(),
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: transportRoutes,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Text('No transport routes found');
-                  } else {
-                    return Column(
-                      children: snapshot.data!.map((route) {
-                        return ListTile(
-                          title: Text(route['route_name']),
-                          subtitle: Text('From: ${route['start_point']} To: ${route['end_point']}'),
-                        );
-                      }).toList(),
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
+      home: HomeScreen(),
     );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    insertSampleData();
   }
 
   Future<void> insertSampleData() async {
-    final dbHelper = DatabaseHelper();
-    await dbHelper.insertSampleData();
+    try {
+      final db = await DatabaseHelper.instance.database;
+      print('Database initialized: $db');
+
+      // Insert landmarks
+      await db.insert('landmarks', {
+        'name': 'Lalmai Hill',
+        'description': 'A historic hill in Cumilla.',
+        'latitude': 23.4618,
+        'longitude': 91.1809,
+        'category': 'Tourist Spot',
+      });
+
+      print('Landmark inserted');
+
+      // Insert emergency contacts
+      await db.insert('emergency_contacts', {
+        'name': 'Police Station',
+        'type': 'Police',
+        'phone_number': '999',
+      });
+
+      print('Emergency contact inserted');
+
+      // Insert transport routes
+      await db.insert('transport_routes', {
+        'route_name': 'Cumilla Bus Route',
+        'start_point': 'Cumilla Station',
+        'end_point': 'Dhaka Station',
+        'stops': '["Cumilla", "Narsingdi", "Dhaka"]',
+      });
+
+      print('Transport route inserted');
+    } catch (e) {
+      print("Error inserting sample data: $e");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Cumilla Go'),
+      ),
+      body: Center(
+        child: Text('Welcome to Cumilla Go!'),
+      ),
+    );
   }
 }
